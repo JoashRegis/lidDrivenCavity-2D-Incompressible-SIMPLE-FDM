@@ -37,19 +37,33 @@ int main() {
     vector<vector<double>> v_star(x + 1, vector<double>(y, 0));
     vector<vector<double>> p_prime(x + 1, vector<double>(y + 1, 0));
 
+    setBoundaryConditions(u, v);
+
     return 0;
 }
 
 void setBoundaryCondition(vector<vector<double>>& u, vector<vector<double>>& v) {
-    // setting normal velocity for left and right wall
-    for (int i = 0; i < x; i++) {
-        u[0][i] = 0;
-        u[x - 1][i] = 0;
+    // setting normal velocity on top and bottom
+    for (int j = 0; j <= y; j++) {
+        v[0][j] = 0;
+        v[x-1][j] = 0;
     }
 
-    // setting normal velocity for bottom ball and top surface
-    for (int i = 0; i < y; i++) {
-        v[i][0] = 0;
-        v[i][y - 1] = 0;
+    // setting normal velocity for left and right walls
+    for (int i = 0; i <= x; i++) {
+        u[i][0] = 0;
+        u[i][y-1] = 0;
+    }
+
+    // setting tangential velocity for top and bottom wall
+    for (int i = 1; i < x-1; i++) {
+        u[i][0] = -u[i][1];
+        u[i][y] = 2 * U_lid - u[i][y-1];
+    }
+
+    // setting tangential velocity for left and right wall
+    for (int j = 1; j < y-1; j++) {
+        v[0][j] = -v[1][j];
+        v[x][j] = -v[x-1][j];
     }
 }
