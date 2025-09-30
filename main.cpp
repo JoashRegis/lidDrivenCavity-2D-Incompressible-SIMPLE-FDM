@@ -5,8 +5,8 @@
 using namespace std;
 
 // number of grids
-const int x = 100;
-const int y = 100;
+const int x = 128;
+const int y = 128;
 
 // dimension of cavity
 const double lx = 1;
@@ -15,7 +15,6 @@ const double ly = 1;
 const double dx = lx / (x - 1); //  x spaceing between grids
 const double dy = ly / (y - 1); // y spacing between grids
 const double dt = 0.001; // time step
-const double T = 5; // total time for solver
 const double alpha_p = 0.8; // relaxation factor for pressure
 const int max_iter = 20000;
 
