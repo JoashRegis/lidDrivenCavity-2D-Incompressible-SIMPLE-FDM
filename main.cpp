@@ -18,7 +18,7 @@ const double dt = 0.0005; // time step
 const double alpha_p = 0.8; // relaxation factor for pressure
 const int max_iter = 20000;
 
-const double rho = 100; // density
+const double rho = 1; // density
 const double mu = 0.01; // dynamic viscosity
 const double u_lid = 1; // top wall velocity
 
