@@ -5,8 +5,8 @@
 using namespace std;
 
 // number of grids
-const int x = 128;
-const int y = 128;
+const int x = 129;
+const int y = 129;
 
 // dimension of cavity
 const double lx = 1;
@@ -14,11 +14,11 @@ const double ly = 1;
 
 const double dx = lx / (x - 1); //  x spaceing between grids
 const double dy = ly / (y - 1); // y spacing between grids
-const double dt = 0.001; // time step
+const double dt = 0.0005; // time step
 const double alpha_p = 0.8; // relaxation factor for pressure
 const int max_iter = 20000;
 
-const double rho = 1; // density
+const double rho = 100; // density
 const double mu = 0.01; // dynamic viscosity
 const double u_lid = 1; // top wall velocity
 
@@ -179,20 +179,20 @@ void writeResults(const vector<vector<double>>& u, const vector<vector<double>>&
     }
 
     // Write CSV header
-    outfile << "X,Y,U,V,P\n";
+    outfile << "x,y,X,Y,U,V,P\n";
 
     // Output data at cell centers
-    for (int j = 1; j < y; ++j) {
-        for (int i = 1; i < x; ++i) {
-            double x_pos = (i - 0.5) * dx;
-            double y_pos = (j - 0.5) * dy;
+    for (int j = 0; j < y; ++j) {
+        for (int i = 0; i < x; ++i) {
+            double x_pos = i * dx;
+            double y_pos = j * dy;
 
             // Interpolate velocities from faces to cell center
-            double u_center = 0.5 * (u[i-1][j] + u[i][j]);
-            double v_center = 0.5 * (v[i][j-1] + v[i][j]);
+            double u_center = 0.5 * (u[i][j] + u[i][j+1]);
+            double v_center = 0.5 * (v[i][j] + v[i+1][j]);
             double p_center = 0.25 * (p[i][j] + p[i+1][j] + p[i][j+1] + p[i+1][j+1]);
 
-            outfile << x_pos << "," << y_pos << "," << u_center << "," << v_center << "," << p_center << "\n";
+            outfile << i+1 << "," << j+1 << "," << x_pos << "," << y_pos << "," << u_center << "," << v_center << "," << p_center << "\n";
         }
     }
 
@@ -210,15 +210,17 @@ int main() {
     vector<vector<double>> v_star(x + 1, vector<double>(y, 0));
     vector<vector<double>> p_prime(x + 1, vector<double>(y + 1, 0));
 
+    setBoundaryConditions(u, v);
+
     for (int iter = 0; iter < max_iter; iter++) {
         
-        setBoundaryConditions(u, v);
-
         solveMomentum(u, v, p, u_star, v_star);
 
         pressureCorrection(u_star, v_star, p_prime);
 
         correctFields(u, v, p, u_star, v_star, p_prime);
+
+        setBoundaryConditions(u, v);
 
         if (iter % 100 == 0) {
             cout << "Iteration: " << iter << "\r" << flush;
