@@ -116,11 +116,9 @@ void pressureCorrection(const vector<vector<double>>& u_star, const vector<vecto
     vector<vector<double>> d(x + 1, vector<double>(y + 1, 0));
     for (int i = 1; i < x; i++) {
         for (int j = 1; j < y; j++) {
-            // FIX: The continuity equation uses a minus sign for the v-term.
             d[i][j] = ((1 / dx) * (rho * u_star[i][j] - rho * u_star[i-1][j])) + ((1 / dy) * (rho * v_star[i][j] - rho * v_star[i][j-1]));
         }
     }
-
 
     for (int iter = 0; iter < p_iter; iter++) {
         double max_err = 0;
@@ -173,10 +171,10 @@ void correctFields(vector<vector<double>>& u, vector<vector<double>>& v, vector<
     }
 }
 
-void write_results(const vector<vector<double>>& u, const vector<vector<double>>& v, const vector<vector<double>>& p) {
-    std::ofstream outfile("results.csv");
+void writeResults(const vector<vector<double>>& u, const vector<vector<double>>& v, const vector<vector<double>>& p) {
+    ofstream outfile("results.csv");
     if (!outfile.is_open()) {
-        std::cerr << "Error: Could not open results.csv for writing." << std::endl;
+        cerr << "Error: Could not open results.csv for writing." << endl;
         return;
     }
 
@@ -199,8 +197,7 @@ void write_results(const vector<vector<double>>& u, const vector<vector<double>>
     }
 
     outfile.close();
-    std::cout << "\nResults written to results.csv" << std::endl;
-    std::cout << "You can now open the CSV file in any spreadsheet software or use the provided python script to view the data." << std::endl;
+    cout << "\nResults written to results.csv" << endl;
 }
 
 int main() {
@@ -228,7 +225,7 @@ int main() {
         }
     }
 
-    write_results(u, v, p);
+    writeResults(u, v, p);
 
     return 0;
 }
