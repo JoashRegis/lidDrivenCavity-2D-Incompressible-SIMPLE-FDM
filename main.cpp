@@ -208,7 +208,7 @@ int main() {
     // Initializing grids for different flow fields
     vector<vector<double>> u(x, vector<double>(y + 1, 0));
     vector<vector<double>> u_old(x, vector<double>(y + 1, 0));
-    vector<vector<double>> v(x + 1, vector<double>(y, 0));
+    // vector<vector<double>> v(x + 1, vector<double>(y, 0));
     vector<vector<double>> p(x + 1, vector<double>(y + 1, 0));
     vector<vector<double>> u_star(x, vector<double>(y + 1, 0));
     vector<vector<double>> v_star(x + 1, vector<double>(y, 0));
