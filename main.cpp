@@ -232,7 +232,6 @@ int main() {
         if (iter % 100 == 0) {
             cout << "Iteration: " << iter <<  "\r" << flush;
         }
-        iter += 1;
     }
 
     writeResults(u, v, p);
