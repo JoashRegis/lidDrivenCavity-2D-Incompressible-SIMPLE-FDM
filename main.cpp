@@ -12,11 +12,14 @@ const int y = 129;
 const double lx = 1;
 const double ly = 1;
 
-const double dx = lx / (x - 1); //  x spaceing between grids
+const double dx = lx / (x - 1); //  x spaceing between grids2e3
 const double dy = ly / (y - 1); // y spacing between grids
 const double dt = 0.0005; // time step
 const double alpha_p = 0.8; // relaxation factor for pressure
+const double alpha_u = 0.7;
+const double alpha_v = 0.7;
 const int max_iter = 20000;
+// double max_err = 1;
 
 const double rho = 1; // density
 const double mu = 0.01; // dynamic viscosity
@@ -152,14 +155,14 @@ void correctFields(vector<vector<double>>& u, vector<vector<double>>& v, vector<
     // u field
     for (int i = 1; i < x - 1; i++) {
         for (int j = 1; j < y; j++) {
-            u[i][j] = u_star[i][j] - (dt / rho) * (p_prime[i+1][j] - p_prime[i][j]) / dx;
+            u[i][j] = (u_star[i][j] - (dt / rho) * (p_prime[i+1][j] - p_prime[i][j]) / dx) * alpha_u + (1 - alpha_u) * u[i][j];
         }
     }
 
     // v field
     for (int i = 1; i < x; i++) {
         for (int j = 1; j < y - 1; j++) {
-            v[i][j] = v_star[i][j] - (dt / rho) * (p_prime[i][j+1] - p_prime[i][j]) / dy;
+            v[i][j] = (v_star[i][j] - (dt / rho) * (p_prime[i][j+1] - p_prime[i][j]) / dy) * alpha_v + (1 - alpha_v) * v[i][j];
         }
     }
 
@@ -187,7 +190,7 @@ void writeResults(const vector<vector<double>>& u, const vector<vector<double>>&
             double x_pos = i * dx;
             double y_pos = j * dy;
 
-            // Interpolate velocities from faces to cell center
+            // Interpolate velocities and pressure from faces to cell center
             double u_center = 0.5 * (u[i][j] + u[i][j+1]);
             double v_center = 0.5 * (v[i][j] + v[i+1][j]);
             double p_center = 0.25 * (p[i][j] + p[i+1][j] + p[i][j+1] + p[i+1][j+1]);
@@ -204,6 +207,7 @@ int main() {
 
     // Initializing grids for different flow fields
     vector<vector<double>> u(x, vector<double>(y + 1, 0));
+    vector<vector<double>> u_old(x, vector<double>(y + 1, 0));
     vector<vector<double>> v(x + 1, vector<double>(y, 0));
     vector<vector<double>> p(x + 1, vector<double>(y + 1, 0));
     vector<vector<double>> u_star(x, vector<double>(y + 1, 0));
@@ -213,7 +217,8 @@ int main() {
     setBoundaryConditions(u, v);
 
     for (int iter = 0; iter < max_iter; iter++) {
-        
+        // max_err = 0;
+        // u_old = u;
         solveMomentum(u, v, p, u_star, v_star);
 
         pressureCorrection(u_star, v_star, p_prime);
@@ -221,10 +226,13 @@ int main() {
         correctFields(u, v, p, u_star, v_star, p_prime);
 
         setBoundaryConditions(u, v);
-
+        // for (int j = 0; j <= y; j++) {
+        //     max_err = max(max_err, abs(u_old[64][j] - u[64][j]));
+        // }
         if (iter % 100 == 0) {
-            cout << "Iteration: " << iter << "\r" << flush;
+            cout << "Iteration: " << iter <<  "\r" << flush;
         }
+        iter += 1;
     }
 
     writeResults(u, v, p);
